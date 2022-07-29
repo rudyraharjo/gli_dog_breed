@@ -1,4 +1,4 @@
-package com.domain.glidgbreeds.breed;
+package com.domain.glidgbreeds.subbreed;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -12,20 +12,14 @@ public class SubBreed implements Serializable {
     )
     @Column(columnDefinition = "serial")
     private Long id;
-
     private String name;
-
-    @ManyToOne
-    @JoinColumn(name = "breed_id", nullable=false)
-    private Breed breed;
 
     public SubBreed() {
     }
 
-    public SubBreed(Long id, String name, Breed breed) {
+    public SubBreed(Long id, String name) {
         this.id = id;
         this.name = name;
-        this.breed = breed;
     }
 
     public Long getId() {
@@ -44,11 +38,4 @@ public class SubBreed implements Serializable {
         this.name = name;
     }
 
-    public Breed getBreed() {
-        return breed;
-    }
-
-    public void setBreed(Breed breed) {
-        this.breed = breed;
-    }
 }

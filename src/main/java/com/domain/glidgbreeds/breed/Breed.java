@@ -1,7 +1,10 @@
 package com.domain.glidgbreeds.breed;
 
+import com.domain.glidgbreeds.subbreed.SubBreed;
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -12,27 +15,32 @@ public class Breed implements Serializable{
             strategy = GenerationType.IDENTITY
     )
     @Column(columnDefinition = "serial")
-    private Long id;
+    private Long breed_id;
     private String name;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "breed")
-    private Set<SubBreed> subBreeds;
+    @OneToMany
+    @JoinTable(
+            name = "fk_breed_sub",
+            joinColumns = @JoinColumn(name = "breed_id"),
+            inverseJoinColumns = @JoinColumn(name = "sub_breed_id")
+    )
+    private Set<SubBreed> subBreeds = new HashSet<SubBreed>();
 
     public Breed() {
     }
 
-    public Breed(Long id, String name, Set<SubBreed> subBreeds) {
-        this.id = id;
+    public Breed(Long breed_id, String name, Set<SubBreed> subBreeds) {
+        this.breed_id = breed_id;
         this.name = name;
         this.subBreeds = subBreeds;
     }
 
-    public Long getId() {
-        return id;
+    public Long getBreed_id() {
+        return breed_id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setBreed_id(Long breed_id) {
+        this.breed_id = breed_id;
     }
 
     public String getName() {

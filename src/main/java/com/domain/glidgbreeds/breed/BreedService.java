@@ -1,11 +1,11 @@
 package com.domain.glidgbreeds.breed;
 
-import com.domain.glidgbreeds.models.RequestBreed;
+import com.domain.glidgbreeds.dto.RequestBreed;
+import com.domain.glidgbreeds.subbreed.SubBreed;
+import com.domain.glidgbreeds.subbreed.SubBreedRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Array;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,32 +22,59 @@ public class BreedService {
         this.subBreedRepository = subBreedRepository;
     }
 
-    public List<Breed> getBreeds(){
-        return breedRepository.findAll();
+    public Iterable<Breed> getBreeds(){
+        return breedRepository
+                .findAll();
+//        return  null;
     }
 
     public void addNewBreed(RequestBreed requestBreed) {
 
-        if(requestBreed.getName() != "") {
-            Breed newBreed = new Breed();
-            newBreed.setName(requestBreed.getName());
+        Breed newBreed = new Breed();
+        newBreed.setName(requestBreed.getName());
+        breedRepository.save(newBreed);
+        List<SubBreed> subBreed = requestBreed.getSubBreeds();
 
-            Breed breed = breedRepository.save(newBreed);
-            breedRepository.flush();
-
-            System.out.println("breed ID " + breed.getId());
-
-            ArrayList<String> subBreed = requestBreed.getSub();
-
-            if (subBreed.size() > 0) {
-                for (int i = 0; i < subBreed.size(); i++) {
-                    SubBreed newSubBreed = new SubBreed();
-                    newSubBreed.setBreed(breed);
-                    newSubBreed.setName(subBreed.get(i));
-                    subBreedRepository.save(newSubBreed);
-                }
+        if (subBreed.size() > 0) {
+            for (int i = 0; i < subBreed.size(); i++) {
+                SubBreed newSubBreed = new SubBreed();
+                newSubBreed.setName(subBreed.get(i).getName());
+                addNewSubBreed(newSubBreed, newBreed.getBreed_id());
             }
         }
+    }
+
+    public Breed findById(Long id){
+        Optional<Breed> breedExist = breedRepository.findById(id);
+
+        if(!breedExist.isPresent()){
+            return null;
+        }
+        return breedExist.get();
+    }
+
+    public Breed findByName(String name){
+        Optional<Breed> breedByName = breedRepository.findBreedByName(name);
+        if(!breedByName.isPresent()){
+            return null;
+        }
+        return breedByName.get();
+
+
+
+
+
+    }
+
+    public void addNewSubBreed(SubBreed subBreed, Long breedId){
+        Breed breed = findById(breedId);
+        if(breed == null){
+            throw new RuntimeException("Breed with ID: " + breedId + " Not Found");
+        }
+
+        subBreedRepository.save(subBreed);
+        breed.getSubBreeds().add(subBreed);
+        breedRepository.save(breed);
     }
 
     public boolean updateBreed(Long id, Breed breed) {
@@ -55,7 +82,7 @@ public class BreedService {
 
         if (breedExist.isPresent()) {
             Breed updateBreed = breedExist.get();
-            updateBreed.setId(id);
+            updateBreed.setBreed_id(id);
             updateBreed.setName(breed.getName());
             breedRepository.save(updateBreed);
             return true;
@@ -74,9 +101,4 @@ public class BreedService {
         }
     }
 
-    public void addNewSubBreed(SubBreed subBreed) {
-        SubBreed newSubBread = new SubBreed();
-        newSubBread.setName(subBreed.getName());
-        subBreedRepository.save(newSubBread);
-    }
 }

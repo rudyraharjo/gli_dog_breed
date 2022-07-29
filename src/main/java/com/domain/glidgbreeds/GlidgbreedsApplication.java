@@ -12,5 +12,4 @@ public class GlidgbreedsApplication {
 		SpringApplication.run(GlidgbreedsApplication.class, args);
 	}
 
-
 }

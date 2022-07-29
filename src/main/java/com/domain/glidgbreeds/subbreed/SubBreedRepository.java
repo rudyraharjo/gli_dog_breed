@@ -1,4 +1,4 @@
-package com.domain.glidgbreeds.breed;
+package com.domain.glidgbreeds.subbreed;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
